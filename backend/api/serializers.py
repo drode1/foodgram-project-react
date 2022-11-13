@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from recipes.models import Tag
 from users.models import User
 
 
@@ -34,3 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(obj):
         # TODO: Убрать заглушку
         return False
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'name', 'color', 'slug',)
