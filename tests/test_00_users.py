@@ -9,7 +9,7 @@ User = get_user_model()
 class Test00APUser:
     url_login_token = '/api/auth/token/login/'
     url_logout_token = '/api/auth/token/logout/'
-    url_all_users = '/api/users/'
+    url_users = '/api/users/'
     url_user_me = '/api/users/me/'
     url_user_profile = '/api/users/1/'
     url_user_profile_invalid = '/api/users/1000/'
@@ -95,8 +95,8 @@ class Test00APUser:
         )
 
     @pytest.mark.django_db(transaction=True)
-    def test_get_users__valid_request(self, client):
-        url = self.url_all_users
+    def test_get_users__valid_request(self, client, user):
+        url = self.url_users
         response = client.get(url)
         expected_code = 200
         assert response.status_code == expected_code, (
@@ -126,8 +126,8 @@ class Test00APUser:
         response = client.get(url)
         expected_code = 401
         assert response.status_code == expected_code, (
-            f'Убедитесь, что при запросе {url} возвращается '
-            f'код {expected_code}'
+            f'Убедитесь, что при запросе {url} неавторизованным пользователем '
+            f'возвращается код {expected_code}'
         )
         field = 'detail'
         assert field in response.json().keys(), (
@@ -154,23 +154,17 @@ class Test00APUser:
             assert (field in response_json.keys()), (
                 f'Проверьте, что при запросе {url} в ответе есть поле {field}'
             )
+        # TODO: Добавить тест, что при запросе /me/ возвращается id авторизованного пользователя
 
     @pytest.mark.django_db(transaction=True)
     def test_get_user_profile__invalid_request(self, client, auth_client):
-        url = self.url_user_profile
+        url = self.url_user_profile_invalid
         response = client.get(url)
         expected_code = 401
         assert response.status_code == expected_code, (
             f'Убедитесь, что при запросе {url} неавторизованным '
             f'пользователем возвращается код {expected_code}'
         )
-        field = 'detail'
-        assert field in response.json().keys(), (
-            f'Убедитесь, что при запросе {url} неавторизованным пользователем, '
-            f'в ответе возвращается код {expected_code} с ключом {field}.'
-        )
-
-        url = self.url_user_profile_invalid
         response = auth_client.get(url)
         expected_code = 404
         assert response.status_code == expected_code, (
@@ -315,4 +309,42 @@ class Test00APUser:
             f'Убедитесь, что при отправке корректных данных возвращается ответ'
             f' с кодом {expected_code}'
         )
+
     # TODO: Написать тест на регистрацию пользователей
+
+    def test_register_user__invalid_data_request(self, client):
+        url = self.url_users
+        response = client.get(url=url)
+        expected_code = 400
+        response_json = response.json()
+        fields_in_response = (
+            'email', 'id', 'username', 'first_name', 'last_name', 'password',)
+        for field in fields_in_response:
+            assert (field in response_json.keys()), (
+                f'Проверьте, что при пустом запросе {url} в ответе '
+                f'есть поле {field} и код ошибки {expected_code}'
+            )
+        # TODO: Написать доп юз кейсы
+
+    def test_register_user__valid_data_request(self, client):
+        url = self.url_users
+        valid_email = 'fakeuser@email.ru'
+        valid_data = {
+            'first_name': 'Fake',
+            'last_name': 'User',
+            'username': 'FakeUser',
+            'email': valid_email,
+            'password': '!qwer321ty123!'
+        }
+
+        response = client.get(url=url, data=valid_data)
+        expected_code = 204
+        response_json = response.json()
+        fields_in_response = (
+            'email', 'id', 'username', 'first_name', 'last_name',)
+        for field in fields_in_response:
+            assert (field in response_json.keys()), (
+                f'Проверьте, что при пустом запросе {url} в ответе '
+                f'есть поле {field} и код ошибки {expected_code}'
+            )
+        assert User.objects.filter(email=valid_email).count() == 1
