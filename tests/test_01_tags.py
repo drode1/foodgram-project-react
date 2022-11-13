@@ -30,7 +30,8 @@ class Test01ApiTag:
         response = client.get(url=url)
         expected_code = 200
         assert response.status_code == expected_code, (
-            f'Убедитесь, что при запросе {url} возвращается код {expected_code}'
+            f'Убедитесь, что при запросе {url} возвращается '
+            f'код {expected_code}'
         )
         response_json = response.json()
         fields_in_response = ('id', 'name', 'color', 'slug')
@@ -46,7 +47,8 @@ class Test01ApiTag:
         response = client.get(url=url)
         expected_code = 200
         assert response.status_code == expected_code, (
-            f'Убедитесь, что при запросе {url} возвращается код {expected_code}'
+            f'Убедитесь, что при запросе {url} '
+            f'возвращается код {expected_code}'
         )
         response_json = response.json()
         fields_in_response = ('id', 'name', 'color', 'slug')
