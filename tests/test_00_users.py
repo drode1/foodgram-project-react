@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class Test00APUser:
+class Test00ApiUser:
     url_login_token = '/api/auth/token/login/'
     url_logout_token = '/api/auth/token/logout/'
     url_users = '/api/users/'
