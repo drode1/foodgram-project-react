@@ -1,8 +1,7 @@
-from rest_framework import mixins, viewsets, filters
-
 from api.serializers import TagSerializer, IngredientSerializer, \
     RecipeSerializer
 from recipes.models import Tag, Ingredient, Recipe
+from rest_framework import mixins, viewsets, filters
 
 
 class BaseGetApiView(mixins.ListModelMixin, mixins.RetrieveModelMixin,
