@@ -1,7 +1,5 @@
 import os
 
-import djoser.permissions
-import rest_framework.permissions
 from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
