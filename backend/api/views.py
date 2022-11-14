@@ -1,7 +1,8 @@
 from rest_framework import mixins, viewsets, filters
 
-from api.serializers import TagSerializer, IngredientSerializer
-from recipes.models import Tag, Ingredient
+from api.serializers import TagSerializer, IngredientSerializer, \
+    RecipeSerializer
+from recipes.models import Tag, Ingredient, Recipe
 
 
 class BaseGetApiView(mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -25,3 +26,9 @@ class IngredientApiView(BaseGetApiView):
     queryset = Ingredient.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    # TODO: Сделать фильтрацию без регистра
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
