@@ -1,9 +1,6 @@
 import json
 
 import pytest
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
 
 
 class Test00ApiUser:
@@ -347,4 +344,3 @@ class Test00ApiUser:
                 f'Проверьте, что при пустом запросе {url} в ответе '
                 f'есть поле {field} и код ошибки {expected_code}'
             )
-        assert User.objects.filter(email=valid_email).count() == 1

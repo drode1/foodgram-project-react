@@ -5,7 +5,7 @@ class Test01ApiTag:
     url_tags = '/api/tags/'
     url_one_tag = '/api/tags/1/'
 
-    @pytest.django.db.transaction(transaction=True)
+    @pytest.mark.django_db(transaction=True)
     def test_get_tags__invalid_request(self, client):
         url = self.url_tags
         request_types = ('GET', 'HEAD', 'OPTIONS',)
@@ -24,7 +24,7 @@ class Test01ApiTag:
     # TODO: Проверить, что даже админ не может ничего менять через API
     # TODO: Написать аналогичные тесты и для одного тега
 
-    @pytest.django.db.transaction(transaction=True)
+    @pytest.mark.django_db(transaction=True)
     def test_get_tags__valid_request(self, client):
         url = self.url_tags
         response = client.get(url=url)
@@ -41,7 +41,7 @@ class Test01ApiTag:
                 f'поле {field} и код ответа {expected_code}'
             )
 
-    @pytest.django.db.transaction(transaction=True)
+    @pytest.mark.django_db(transaction=True)
     def test_get_tags__valid_request(self, client):
         url = self.url_one_tag
         response = client.get(url=url)
