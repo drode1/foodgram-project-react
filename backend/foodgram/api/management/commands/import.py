@@ -4,7 +4,8 @@ from os.path import dirname, abspath
 from django.core.management import BaseCommand
 
 # Импорт моделей
-from recipes.models import Ingredient
+from recipes.models import Ingredient, Tag
+from users.models import User
 
 
 class Command(BaseCommand):
@@ -14,6 +15,8 @@ class Command(BaseCommand):
     models = (
         (
             (Ingredient, 'ingredients'),
+            (Tag, 'tags'),
+            (User, 'users'),
         ),
     )
 
