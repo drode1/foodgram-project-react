@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from django.contrib.auth import get_user_model
 
 
 class Test00ApiUser:
@@ -8,8 +9,7 @@ class Test00ApiUser:
     url_logout_token = '/api/auth/token/logout/'
     url_users = '/api/users/'
     url_user_me = '/api/users/me/'
-    url_user_profile = '/api/users/1/'
-    url_user_profile_invalid = '/api/users/1000/'
+    url_user_profile = '/api/users/2/'
     url_user_change_password = '/api/users/set_password/'
 
     @pytest.mark.django_db(transaction=True)
@@ -116,6 +116,7 @@ class Test00ApiUser:
             assert (field in response_results), (
                 f'Проверьте, что при запросе {url} в ответе есть поле {field}'
             )
+        # TODO: Написать тесты на работу query params
 
     @pytest.mark.django_db(transaction=True)
     def test_get_me__invalid_request(self, client):
@@ -155,13 +156,15 @@ class Test00ApiUser:
 
     @pytest.mark.django_db(transaction=True)
     def test_get_user_profile__invalid_request(self, client, auth_client):
-        url = self.url_user_profile_invalid
+        url = self.url_user_profile
         response = client.get(url)
         expected_code = 401
         assert response.status_code == expected_code, (
             f'Убедитесь, что при запросе {url} неавторизованным '
             f'пользователем возвращается код {expected_code}'
         )
+        user = get_user_model().objects.get(id=2)
+        user.delete()
         response = auth_client.get(url)
         expected_code = 404
         assert response.status_code == expected_code, (
@@ -175,7 +178,7 @@ class Test00ApiUser:
         )
 
     @pytest.mark.django_db(transaction=True)
-    def test_get_user_profile__valid_request(self, auth_client):
+    def test_get_user_profile__valid_request(self, auth_client, admin_client):
         url = self.url_user_profile
         response = auth_client.get(url)
         expected_code = 200
@@ -308,14 +311,14 @@ class Test00ApiUser:
         )
 
     # TODO: Написать тест на регистрацию пользователей
-
+    @pytest.mark.django_db(transaction=True)
     def test_register_user__invalid_data_request(self, client):
         url = self.url_users
-        response = client.get(url=url)
+        response = client.post(url)
         expected_code = 400
         response_json = response.json()
         fields_in_response = (
-            'email', 'id', 'username', 'first_name', 'last_name', 'password',)
+            'email', 'username', 'first_name', 'last_name', 'password',)
         for field in fields_in_response:
             assert (field in response_json.keys()), (
                 f'Проверьте, что при пустом запросе {url} в ответе '
@@ -323,6 +326,7 @@ class Test00ApiUser:
             )
         # TODO: Написать доп юз кейсы
 
+    @pytest.mark.django_db(transaction=True)
     def test_register_user__valid_data_request(self, client):
         url = self.url_users
         valid_email = 'fakeuser@email.ru'
@@ -334,8 +338,11 @@ class Test00ApiUser:
             'password': '!qwer321ty123!'
         }
 
-        response = client.get(url=url, data=valid_data)
-        expected_code = 204
+        response = client.post(url, data=valid_data)
+        expected_code = 201
+        assert response.status_code == expected_code, (
+            f'Убедитесь, что при запросе {url} возвращается {expected_code}'
+        )
         response_json = response.json()
         fields_in_response = (
             'email', 'id', 'username', 'first_name', 'last_name',)
