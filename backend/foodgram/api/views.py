@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets, status, permissions
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -7,8 +8,8 @@ from api.filters import IngredientFilter
 from api.permissions import IsUserOrAdminOrReadOnly, IsOwner
 from api.serializers import (TagSerializer, IngredientSerializer,
                              RecipeSerializer, ReadRecipeSerializer,
-                             SubscriptionSerializer)
-from recipes.models import Tag, Ingredient, Recipe
+                             SubscriptionSerializer, FavoriteRecipeSerializer)
+from recipes.models import Tag, Ingredient, Recipe, FavoriteRecipes
 from users.models import Subscription, User
 
 
@@ -50,6 +51,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @staticmethod
+    def add_action_method(request, pk, serializers):
+        # TODO: Передавать данные через получение объекта на проверку уникальности
+        data = {'user': request.user.id, 'recipe': pk}
+        serializer = serializers(data=data, context={'request': request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @staticmethod
+    def delete_action_method(request, pk, instance):
+        recipe = get_object_or_404(Recipe, id=pk)
+        instance = get_object_or_404(instance, user=request.user,
+                                     recipe=recipe)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=('POST', 'DELETE',),
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path=r'(?P<pk>\d+)/favorite')
+    def favorite(self, request, pk):
+        if request.method == 'POST':
+            return self.add_action_method(request, pk,
+                                          FavoriteRecipeSerializer)
+        return self.delete_action_method(request, pk, FavoriteRecipes)
 
 
 class SubscriptionApiView(mixins.ListModelMixin,

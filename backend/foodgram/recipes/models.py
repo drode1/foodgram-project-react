@@ -121,3 +121,31 @@ class RecipeTags(models.Model):
 
     def __str__(self):
         return f'{self.recipe.name} - {self.tag}'
+
+
+class FavoriteRecipes(models.Model):
+    """ Модель подписок добавления рецептов в избранное у пользователей. """
+
+    user = models.ForeignKey(User,
+                             verbose_name='Подписчик',
+                             on_delete=models.CASCADE
+                             )
+    recipe = models.ForeignKey(Recipe,
+                               verbose_name='Рецепт',
+                               on_delete=models.CASCADE
+                               )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
+        db_table = 'favorite'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='Unique favorite required',
+
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} -> {self.recipe}'

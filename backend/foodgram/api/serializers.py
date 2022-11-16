@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredientAmount,
-                            RecipeTags)
+                            RecipeTags, FavoriteRecipes)
 from users.models import User, Subscription
 
 
@@ -140,6 +140,17 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount',)
 
 
+class ShortRecipeSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для отображения краткой информации о рецепте.
+    Используется в избранном и корзине.
+    """
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time',)
+
+
 class CreateRecipeIngredientAmountSerializer(serializers.ModelSerializer):
     """ Сериализатор для обработки ингредиентов при создании рецепта. """
 
@@ -271,3 +282,16 @@ class ReadRecipeSerializer(BaseRecipeSerializer):
             'id', 'tags', 'author', 'ingredients', 'name', 'image', 'text',
             'cooking_time'
         )
+
+
+class FavoriteRecipeSerializer(serializers.ModelSerializer):
+    """ Сериализатор для обработки подписок пользователей на рецепты. """
+
+    class Meta:
+        model = FavoriteRecipes
+        fields = ('user', 'recipe',)
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return ShortRecipeSerializer(instance.recipe, context=context).data
