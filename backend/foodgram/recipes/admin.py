@@ -30,5 +30,5 @@ class RecipeAdmin(admin.ModelAdmin):
     """ Класс для управления рецептами в админке сайта. """
 
     inlines = (IngredientsInline, TagInline,)
-    list_display = ('name', 'author',)
+    list_display = ('id', 'name', 'author',)
     list_filter = ('name', 'author',)

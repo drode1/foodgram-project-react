@@ -46,15 +46,12 @@ class UserSerializer(serializers.ModelSerializer):
         нет пользователя.
         """
 
-        if self.context:
-            username = self.context.get('request').user
-            if username.is_anonymous or username == obj.username:
-                return False
-            subscription = Subscription.objects.filter(
-                user=username, follower_id=obj.id).exists()
-            if subscription:
-                return True
-        return False
+        username = self.context.get('request').user
+        if username.is_anonymous or username == obj.username:
+            return False
+        subscription = Subscription.objects.filter(
+            user=username, follower_id=obj.id).exists()
+        return subscription
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
@@ -169,19 +166,34 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     author = UserSerializer(read_only=True)
     is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('is_favorited', 'is_in_shopping_cart',)
 
-    def get_is_favorited(self) -> bool:
-        # TODO: Убрать заглушку
-        return False
+    @staticmethod
+    def check_object_exists(context, instance, obj):
+        username = context.get('request').user
+        if username.is_anonymous:
+            return False
+        object_exist = instance.objects.filter(
+            user=username, recipe_id=obj.id).exists()
+        return object_exist
 
-    def get_is_in_shopping_cart(self) -> bool:
-        # TODO: Убрать заглушку
-        return False
+    def get_is_favorited(self, obj) -> bool:
+        """
+        Метод проверяющий добавил ли текущий пользователь рецепт в избранное.
+        """
+
+        return self.check_object_exists(self.context, FavoriteRecipes, obj)
+
+    def get_is_in_shopping_cart(self, obj) -> bool:
+        """
+        Метод проверяющий добавил ли текущий пользователь рецепт в корзину.
+        """
+
+        return self.check_object_exists(self.context, UserShoppingCart, obj)
 
 
 class RecipeSerializer(BaseRecipeSerializer):
@@ -280,7 +292,7 @@ class ReadRecipeSerializer(BaseRecipeSerializer):
         model = Recipe
         fields = (
             'id', 'tags', 'author', 'ingredients', 'name', 'image', 'text',
-            'cooking_time'
+            'cooking_time', 'is_favorited', 'is_in_shopping_cart',
         )
 
 
