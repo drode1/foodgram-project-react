@@ -149,3 +149,33 @@ class FavoriteRecipes(models.Model):
 
     def __str__(self):
         return f'{self.user.username} -> {self.recipe}'
+
+
+class UserShoppingCart(models.Model):
+    """ Модель корзины, куда пользователей может добавлять рецепты. """
+
+    user = models.ForeignKey(User,
+                             verbose_name='Пользователь',
+                             on_delete=models.CASCADE,
+                             related_name='cart_buyer'
+                             )
+    recipe = models.ForeignKey(Recipe,
+                               verbose_name='Рецепт',
+                               on_delete=models.CASCADE,
+                               related_name='cart_recipe'
+                               )
+
+    class Meta:
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+        db_table = 'cart'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='Unique cart required',
+
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.user.username} -> {self.recipe}'

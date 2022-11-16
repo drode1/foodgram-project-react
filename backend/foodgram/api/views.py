@@ -8,8 +8,10 @@ from api.filters import IngredientFilter
 from api.permissions import IsUserOrAdminOrReadOnly, IsOwner
 from api.serializers import (TagSerializer, IngredientSerializer,
                              RecipeSerializer, ReadRecipeSerializer,
-                             SubscriptionSerializer, FavoriteRecipeSerializer)
-from recipes.models import Tag, Ingredient, Recipe, FavoriteRecipes
+                             SubscriptionSerializer, FavoriteRecipeSerializer,
+                             UserShoppingCartSerializer)
+from recipes.models import Tag, Ingredient, Recipe, FavoriteRecipes, \
+    UserShoppingCart
 from users.models import Subscription, User
 
 
@@ -74,10 +76,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,),
             url_path=r'(?P<pk>\d+)/favorite')
     def favorite(self, request, pk):
+        """ Метод для добавления и удаления рецептов в избранное. """
+
         if request.method == 'POST':
             return self.add_action_method(request, pk,
                                           FavoriteRecipeSerializer)
         return self.delete_action_method(request, pk, FavoriteRecipes)
+
+    @action(detail=False, methods=('POST', 'DELETE',),
+            permission_classes=(permissions.IsAuthenticated,),
+            url_path=r'(?P<pk>\d+)/shopping_cart')
+    def shopping_cart(self, request, pk):
+        """ Метод для добавления и удаления товаров в корзину. """
+
+        if request.method == 'POST':
+            return self.add_action_method(request, pk,
+                                          UserShoppingCartSerializer)
+        return self.delete_action_method(request, pk, UserShoppingCart)
+
+    @action(detail=False, methods=('GET',),
+            permission_classes=(permissions.IsAuthenticated,))
+    def download_shopping_cart(self, request):
+        """ Метод для скачивания корзины пользователей. """
+
+        return Response()
 
 
 class SubscriptionApiView(mixins.ListModelMixin,

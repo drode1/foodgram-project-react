@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredientAmount,
-                            RecipeTags, FavoriteRecipes)
+                            RecipeTags, FavoriteRecipes, UserShoppingCart)
 from users.models import User, Subscription
 
 
@@ -289,6 +289,19 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavoriteRecipes
+        fields = ('user', 'recipe',)
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return ShortRecipeSerializer(instance.recipe, context=context).data
+
+
+class UserShoppingCartSerializer(serializers.ModelSerializer):
+    """ Сериализатор для обработки корзины пользователей. """
+
+    class Meta:
+        model = UserShoppingCart
         fields = ('user', 'recipe',)
 
     def to_representation(self, instance):
