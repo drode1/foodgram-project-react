@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.filters import IngredientFilter, RecipeFilter
+from api.mixins import BaseGetApiView
 from api.permissions import IsUserOrAdminOrReadOnly, IsOwner
 from api.serializers import (TagSerializer, IngredientSerializer,
                              RecipeSerializer, ReadRecipeSerializer,
@@ -14,14 +15,6 @@ from api.serializers import (TagSerializer, IngredientSerializer,
 from recipes.models import (Tag, Ingredient, Recipe, FavoriteRecipes,
                             UserShoppingCart)
 from users.models import Subscription, User
-
-
-class BaseGetApiView(mixins.ListModelMixin, mixins.RetrieveModelMixin,
-                     viewsets.GenericViewSet):
-    """ Базовый класс используемый для тегов и ингредиентов. """
-
-    permission_classes = (permissions.AllowAny,)
-    pagination_class = None
 
 
 class TagApiView(BaseGetApiView):
@@ -114,6 +107,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,))
     def download_shopping_cart(self, request):
         """ Метод для скачивания корзины пользователей. """
+        # TODO: Сделать метод скачивания корзины
 
         return Response()
 
