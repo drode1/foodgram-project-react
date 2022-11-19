@@ -1,17 +1,18 @@
 from django.shortcuts import get_object_or_404
+from django_filters import rest_framework
 from rest_framework import mixins, viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.filters import IngredientFilter
+from api.filters import IngredientFilter, RecipeFilter
 from api.permissions import IsUserOrAdminOrReadOnly, IsOwner
 from api.serializers import (TagSerializer, IngredientSerializer,
                              RecipeSerializer, ReadRecipeSerializer,
                              SubscriptionSerializer, FavoriteRecipeSerializer,
                              UserShoppingCartSerializer)
-from recipes.models import Tag, Ingredient, Recipe, FavoriteRecipes, \
-    UserShoppingCart
+from recipes.models import (Tag, Ingredient, Recipe, FavoriteRecipes,
+                            UserShoppingCart)
 from users.models import Subscription, User
 
 
@@ -35,9 +36,8 @@ class IngredientApiView(BaseGetApiView):
 
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    filter_backends = (IngredientFilter,)
-    search_fields = ('^name',)
-    # TODO: Сделать фильтрацию без регистра
+    filter_backends = (rest_framework.DjangoFilterBackend,)
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -45,6 +45,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     permission_classes = (IsUserOrAdminOrReadOnly,)
+    filter_backends = (rest_framework.DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -56,16 +58,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def add_action_method(request, pk, serializers):
-        # TODO: Передавать данные через получение объекта на проверку уникальности
+        """
+        Общий метод для обработки запросов на добавление подписки и товаров
+        в корзину.
+        """
+
         data = {'user': request.user.id, 'recipe': pk}
+        favorite = FavoriteRecipes.objects.filter(user_id=request.user.id,
+                                                  recipe_id=pk).exists()
+        if favorite:
+            return Response({'errors': 'Такая подписка уже существует'},
+                            status=status.HTTP_400_BAD_REQUEST)
         serializer = serializers(data=data, context={'request': request})
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
     def delete_action_method(request, pk, instance):
+        """
+        Общий метод для обработки запросов на удаление подписок и товаров
+        в корзине.
+        """
+
         recipe = get_object_or_404(Recipe, id=pk)
         instance = get_object_or_404(instance, user=request.user,
                                      recipe=recipe)
