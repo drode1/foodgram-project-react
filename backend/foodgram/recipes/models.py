@@ -109,10 +109,12 @@ class RecipeTags(models.Model):
     tag = models.ForeignKey(Tag,
                             on_delete=models.CASCADE,
                             verbose_name='Тег',
+                            related_name='recipe_tag'
                             )
     recipe = models.ForeignKey(Recipe,
                                on_delete=models.CASCADE,
                                verbose_name='Рецепт',
+                               related_name='recipe_tag'
                                )
 
     class Meta:
@@ -128,11 +130,13 @@ class FavoriteRecipes(models.Model):
 
     user = models.ForeignKey(User,
                              verbose_name='Подписчик',
-                             on_delete=models.CASCADE
+                             on_delete=models.CASCADE,
+                             related_name='favorite_recipe'
                              )
     recipe = models.ForeignKey(Recipe,
                                verbose_name='Рецепт',
-                               on_delete=models.CASCADE
+                               on_delete=models.CASCADE,
+                               related_name='favorite_recipe'
                                )
 
     class Meta:
@@ -157,12 +161,12 @@ class UserShoppingCart(models.Model):
     user = models.ForeignKey(User,
                              verbose_name='Пользователь',
                              on_delete=models.CASCADE,
-                             related_name='cart_buyer'
+                             related_name='shopping_cart'
                              )
     recipe = models.ForeignKey(Recipe,
                                verbose_name='Рецепт',
                                on_delete=models.CASCADE,
-                               related_name='cart_recipe'
+                               related_name='shopping_cart'
                                )
 
     class Meta:
