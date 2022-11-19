@@ -64,14 +64,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """
 
         data = {'user': request.user.id, 'recipe': pk}
-        favorite = FavoriteRecipes.objects.filter(user_id=request.user.id,
-                                                  recipe_id=pk).exists()
+        favorite = get_object_or_404(FavoriteRecipes, user_id=request.user.id,
+                                     recipe_id=pk)
         if favorite:
             return Response({'errors': 'Такая подписка уже существует'},
                             status=status.HTTP_400_BAD_REQUEST)
         serializer = serializers(data=data, context={'request': request})
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
     def delete_action_method(request, pk, instance):
