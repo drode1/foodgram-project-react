@@ -1,12 +1,24 @@
 from django.contrib import admin
 
-# Register your models here.
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredientAmount,
-                            RecipeTags
+                            RecipeTags, FavoriteRecipes, UserShoppingCart
                             )
 
-admin.site.register(Tag)
-admin.site.register(Ingredient)
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    """ Класс для управления тегами в админке сайта. """
+
+    list_display = ('id', 'name', 'color', 'slug',)
+    list_filter = ('name', 'slug',)
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(admin.ModelAdmin):
+    """ Класс для управления ингредиентами в админке сайта. """
+
+    list_display = ('id', 'name', 'measurement_unit',)
+    list_filter = ('name',)
 
 
 class TagInline(admin.TabularInline):
@@ -32,3 +44,27 @@ class RecipeAdmin(admin.ModelAdmin):
     inlines = (IngredientsInline, TagInline,)
     list_display = ('id', 'name', 'author',)
     list_filter = ('name', 'author',)
+
+
+@admin.register(RecipeTags)
+class RecipeTagsAdmin(admin.ModelAdmin):
+    """ Класс для управления привязок тегов к рецептам в админке сайта. """
+
+    list_display = ('id', 'tag', 'recipe',)
+    list_filter = ('tag', 'recipe',)
+
+
+@admin.register(FavoriteRecipes)
+class FavoriteRecipesAdmin(admin.ModelAdmin):
+    """ Класс для управления избранными рецептами в админке сайта. """
+
+    list_display = ('id', 'user', 'recipe',)
+    list_filter = ('user', 'recipe',)
+
+
+@admin.register(UserShoppingCart)
+class UserShoppingCartAdmin(admin.ModelAdmin):
+    """ Класс для управления корзиной с рецептами в админке сайта. """
+
+    list_display = ('id', 'user', 'recipe',)
+    list_filter = ('user', 'recipe',)
