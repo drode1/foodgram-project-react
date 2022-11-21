@@ -1,5 +1,4 @@
 from csv import DictReader
-from os.path import dirname, abspath
 
 from django.core.management import BaseCommand
 
@@ -20,16 +19,12 @@ class Command(BaseCommand):
         ),
     )
 
-    root_dir = dirname(
-        dirname(dirname(dirname(dirname(dirname(abspath(__file__)))))))
-
     def import_data(self):
         """ Метод импортирует пользователей, категории и жанры в БД. """
 
         for data in self.models:
             for model, file in data:
-                with open(f'{self.root_dir}/data/{file}.csv',
-                          encoding='utf-8') as f:
+                with open(f'static/data/{file}.csv', encoding='utf-8') as f:
                     print(f'Начался импорт данных {file}')
                     for row in DictReader(f):
                         if not model.objects.filter(**row).exists():

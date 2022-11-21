@@ -1,0 +1,7 @@
+name          ,color  ,slug
+Завтрак       ,#8e82c6,breakfast
+Обед          ,#13678a,lunch
+Ужин          ,#ea2074,supper
+Второй завтрак,#93f2a5,branch
+Полдник       ,#faae25,afternoon-tea
+Ночной жор    ,#2378d2,night-zhor
