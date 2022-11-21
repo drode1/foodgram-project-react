@@ -1,6 +1,7 @@
 import base64
 from typing import Dict
 
+from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -36,6 +37,15 @@ class CreateUserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+
+    def create(self, validated_data):
+        # Переопределяем метод, чтобы хэшировать пароль
+        validated_data['password'] = make_password(
+            validated_data.get('password')
+        )
+        user = User.objects.create(**validated_data)
+        user.save()
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):
