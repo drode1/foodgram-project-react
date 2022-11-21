@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from api.filters import IngredientFilter, RecipeFilter
 from api.mixins import BaseGetApiView
-from api.permissions import IsUserOrAdminOrReadOnly, IsOwner
+from api.permissions import IsUserOrAdminOrReadOnly
 from api.serializers import (TagSerializer, IngredientSerializer,
                              RecipeSerializer, ReadRecipeSerializer,
                              SubscriptionSerializer, FavoriteRecipeSerializer,
@@ -50,17 +50,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     @staticmethod
-    def add_action_method(request, pk, serializers):
+    def add_action_method(request, pk, serializers, instance):
         """
         Общий метод для обработки запросов на добавление подписки и товаров
         в корзину.
         """
 
         data = {'user': request.user.id, 'recipe': pk}
-        favorite = get_object_or_404(FavoriteRecipes, user_id=request.user.id,
-                                     recipe_id=pk)
-        if favorite:
-            return Response({'errors': 'Такая подписка уже существует'},
+        instance = instance.objects.filter(user_id=request.user.id,
+                                           recipe_id=pk).exists()
+        if instance:
+            return Response({'errors': 'Такой объект уже существует'},
                             status=status.HTTP_400_BAD_REQUEST)
         serializer = serializers(data=data, context={'request': request})
         if serializer.is_valid(raise_exception=True):
@@ -89,7 +89,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             return self.add_action_method(request, pk,
-                                          FavoriteRecipeSerializer)
+                                          FavoriteRecipeSerializer,
+                                          FavoriteRecipes)
         return self.delete_action_method(request, pk, FavoriteRecipes)
 
     @action(detail=False, methods=('POST', 'DELETE',),
@@ -100,7 +101,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             return self.add_action_method(request, pk,
-                                          UserShoppingCartSerializer)
+                                          UserShoppingCartSerializer,
+                                          UserShoppingCart)
         return self.delete_action_method(request, pk, UserShoppingCart)
 
     @action(detail=False, methods=('GET',),
@@ -128,7 +130,7 @@ class SubscriptionApiView(mixins.ListModelMixin,
 class SubscribeApiView(APIView):
     """ Вью для обработки подписок и удаления подписок у пользователей. """
 
-    permission_classes = (IsOwner,)
+    permission_classes = (IsUserOrAdminOrReadOnly,)
     serializer_class = SubscriptionSerializer
 
     def post(self, request, *args, **kwargs):
