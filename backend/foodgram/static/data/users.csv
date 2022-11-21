@@ -1,2 +1,3 @@
-id,password                                                                                ,last_login                ,is_superuser,username,is_staff,is_active,date_joined               ,first_name,last_name,email
-1 ,pbkdf2_sha256$260000$l9Gte8CMfpL3ZXrTJcPGhR$j/07vCPRcxtKlitGDFYPQ3O8BGeUwVyVRaAtQOWnHFE=,2022-11-14 22:47:28.698730,1           ,admin   ,1       ,1        ,2022-11-14 22:47:16.512334,admin     ,admin    ,admin@admin.ru
+id,password,last_login,is_superuser,username,is_staff,is_active,date_joined,first_name,last_name,email
+1,pbkdf2_sha256$260000$l9Gte8CMfpL3ZXrTJcPGhR$j/07vCPRcxtKlitGDFYPQ3O8BGeUwVyVRaAtQOWnHFE=,2022-11-14 22:47:28.698730,1,admin,1,1,2022-11-14 22:47:16.512334,admin,admin,admin@admin.ru
+2,pbkdf2_sha256$260000$l9Gte8CMfpL3ZXrTJcPGhR$j/07vCPRcxtKlitGDFYPQ3O8BGeUwVyVRaAtQOWnHFE=,2022-11-14 22:47:28.698730,0,test,0,1,2022-11-14 22:47:16.512334,test,test,test@test.ru
