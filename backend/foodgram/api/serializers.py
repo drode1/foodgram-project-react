@@ -98,7 +98,7 @@ class SubscriptionSerializer(UserSerializer):
     пользовательском сериализаторе.
     """
 
-    recipes = RecipeListSerializer(read_only=True)
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     email = serializers.EmailField(read_only=True)
 

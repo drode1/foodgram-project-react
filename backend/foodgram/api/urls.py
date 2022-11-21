@@ -17,6 +17,6 @@ urlpatterns = [
     path('users/<int:user_id>/subscribe/', SubscribeApiView.as_view(),
          name='subscribe'),
     path('', include(router.urls)),
-    path(r'', include('djoser.urls')),
+    path('', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
 ]
