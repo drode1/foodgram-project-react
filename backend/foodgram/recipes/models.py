@@ -73,7 +73,7 @@ class Recipe(models.Model):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         db_table = 'recipes'
-        ordering = ('id',)
+        ordering = ('-id',)
 
     def __str__(self):
         return self.name
