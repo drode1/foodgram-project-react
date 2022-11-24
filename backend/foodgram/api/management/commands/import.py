@@ -1,7 +1,6 @@
 from csv import DictReader
 
 from django.core.management import BaseCommand
-
 # Импорт моделей
 from recipes.models import Ingredient, Tag
 from users.models import User

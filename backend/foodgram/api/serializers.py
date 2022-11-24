@@ -4,12 +4,12 @@ from typing import Dict
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
+from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
+                            RecipeIngredientAmount, RecipeTags, Tag,
+                            UserShoppingCart)
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-
-from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredientAmount,
-                            RecipeTags, FavoriteRecipes, UserShoppingCart)
-from users.models import User, Subscription
+from users.models import Subscription, User
 
 
 class Base64ImageField(serializers.ImageField):
@@ -259,10 +259,10 @@ class RecipeSerializer(BaseRecipeSerializer):
         """ Валидируем теги и ингредиенты на пустые списки и дубликаты. """
 
         duplicate_error = serializers.ValidationError({
-            'error': f'Нельзя добавить одинаковые элементы'
+            'error': 'Нельзя добавить одинаковые элементы'
         })
         empty_error = serializers.ValidationError({
-            'error': f'Список не может быть пустым'
+            'error': 'Список не может быть пустым'
         })
         ingredients_set = data['recipeingredientamount_set']
         if not ingredients_set:
