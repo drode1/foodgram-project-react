@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework
 from rest_framework import mixins, viewsets, status, permissions
@@ -13,7 +16,7 @@ from api.serializers import (TagSerializer, IngredientSerializer,
                              SubscriptionSerializer, FavoriteRecipeSerializer,
                              UserShoppingCartSerializer)
 from recipes.models import (Tag, Ingredient, Recipe, FavoriteRecipes,
-                            UserShoppingCart)
+                            UserShoppingCart, RecipeIngredientAmount)
 from users.models import Subscription, User
 
 
@@ -109,9 +112,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(permissions.IsAuthenticated,))
     def download_shopping_cart(self, request):
         """ Метод для скачивания корзины пользователей. """
-        # TODO: Сделать метод скачивания корзины
 
-        return Response()
+        cart_ingredients = {}
+        cart_recipes = (
+            UserShoppingCart.objects.filter(user=request.user).values(
+                'recipe_id')
+        )
+        recipes = Recipe.objects.filter(pk__in=cart_recipes)
+        for recipe in recipes:
+            ingredients_amount = RecipeIngredientAmount.objects.filter(
+                recipe=recipe)
+            for ingredient in ingredients_amount:
+                name = (f'{ingredient.ingredient.name} '
+                        f'({ingredient.ingredient.measurement_unit})'
+                        )
+                amount = ingredient.amount
+                if name in cart_ingredients:
+                    cart_ingredients[name] += amount
+                else:
+                    cart_ingredients[name] = amount
+
+        response = HttpResponse(content_type='text/plain')
+        file_body = 'Список покупок:\n'
+        for name, amount in cart_ingredients.items():
+            file_body += f'{name} – {amount} \n'
+        response.write(file_body)
+        return response
 
 
 class SubscriptionApiView(mixins.ListModelMixin,
