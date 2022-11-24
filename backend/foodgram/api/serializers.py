@@ -4,11 +4,12 @@ from typing import Dict
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
 from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
                             RecipeIngredientAmount, RecipeTags, Tag,
                             UserShoppingCart)
-from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from users.models import Subscription, User
 
 
@@ -74,9 +75,8 @@ class UserSerializer(serializers.ModelSerializer):
         username = self.context.get('request').user
         if username.is_anonymous or username == obj.username:
             return False
-        subscription = Subscription.objects.filter(
-            user=username, follower_id=obj.id).exists()
-        return subscription
+        return Subscription.objects.filter(user=username,
+                                           follower_id=obj.id).exists()
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
@@ -202,9 +202,8 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
         username = context.get('request').user
         if username.is_anonymous:
             return False
-        object_exist = instance.objects.filter(
-            user=username, recipe_id=obj.id).exists()
-        return object_exist
+        return instance.objects.filter(user=username,
+                                       recipe_id=obj.id).exists()
 
     def get_is_favorited(self, obj) -> bool:
         """

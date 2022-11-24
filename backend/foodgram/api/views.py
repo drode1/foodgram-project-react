@@ -146,8 +146,7 @@ class SubscriptionApiView(mixins.ListModelMixin,
     def get_queryset(self):
         user = get_object_or_404(User, id=self.request.user.id)
         follower = Subscription.objects.filter(user=user).values('follower')
-        query_set = User.objects.filter(id__in=follower)
-        return query_set
+        return User.objects.filter(id__in=follower)
 
 
 class SubscribeApiView(APIView):
