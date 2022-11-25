@@ -12,8 +12,9 @@ class UserAdmin(admin.ModelAdmin):
                     'get_quantity_user_recipes',)
     list_filter = ('username', 'email',)
 
+    @staticmethod
     @admin.display(description='Кол-во рецептов')
-    def get_quantity_user_recipes(self, obj):
-        """ Подсчитывает кол-во рецептов каждого пользователя. """
+    def get_quantity_user_recipes(obj):
+        """ Метод подсчитывает кол-во рецептов каждого пользователя. """
 
         return Recipe.objects.filter(author_id=obj.id).count()
