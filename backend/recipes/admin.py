@@ -42,8 +42,27 @@ class RecipeAdmin(admin.ModelAdmin):
     """ Класс для управления рецептами в админке сайта. """
 
     inlines = (IngredientsInline, TagInline,)
-    list_display = ('id', 'name', 'author',)
+    list_display = ('id', 'name', 'author', 'get_recipe_favorite_quantity',
+                    'get_recipe_ingredients',)
     list_filter = ('name', 'author',)
+
+    @staticmethod
+    @admin.display(description='Лайки')
+    def get_recipe_favorite_quantity(obj):
+        """
+        Метод подсчитывает пользователей добавили данный рецепт в избранное.
+        """
+
+        return FavoriteRecipes.objects.filter(recipe_id=obj.id).count()
+
+    @staticmethod
+    @admin.display(description='Ингредиенты')
+    def get_recipe_ingredients(obj):
+        """
+        Метод выводит список ингредиентов, которые привязаны к рецепту.
+        """
+
+        return [ing for ing in Ingredient.objects.filter(recipe__id=obj.id)]
 
 
 @admin.register(RecipeTags)
