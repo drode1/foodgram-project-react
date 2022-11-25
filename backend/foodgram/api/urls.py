@@ -1,7 +1,9 @@
-from api.views import (IngredientApiView, RecipeViewSet, SubscribeApiView,
-                       SubscriptionApiView, TagApiView)
 from django.urls import include, path
 from rest_framework import routers
+
+from foodgram.api.views import (IngredientApiView, RecipeViewSet,
+                                SubscribeApiView,
+                                SubscriptionApiView, TagApiView)
 
 app_name = 'api'
 

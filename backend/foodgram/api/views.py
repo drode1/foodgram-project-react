@@ -1,20 +1,23 @@
-from api.filters import IngredientFilter, RecipeFilter
-from api.mixins import BaseGetApiView
-from api.permissions import IsUserOrAdminOrReadOnly
-from api.serializers import (FavoriteRecipeSerializer, IngredientSerializer,
-                             ReadRecipeSerializer, RecipeSerializer,
-                             SubscriptionSerializer, TagSerializer,
-                             UserShoppingCartSerializer)
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework
-from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
-                            RecipeIngredientAmount, Tag, UserShoppingCart)
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from users.models import Subscription, User
+
+from foodgram.api.filters import IngredientFilter, RecipeFilter
+from foodgram.api.mixins import BaseGetApiView
+from foodgram.api.permissions import IsUserOrAdminOrReadOnly
+from foodgram.api.serializers import (FavoriteRecipeSerializer,
+                                      IngredientSerializer,
+                                      ReadRecipeSerializer, RecipeSerializer,
+                                      SubscriptionSerializer, TagSerializer,
+                                      UserShoppingCartSerializer)
+from foodgram.recipes.models import (FavoriteRecipes, Ingredient, Recipe,
+                                     RecipeIngredientAmount, Tag,
+                                     UserShoppingCart)
+from foodgram.users.models import Subscription, User
 
 
 class TagApiView(BaseGetApiView):
