@@ -7,7 +7,7 @@
 продуктовую корзину выбранных рецептов пользователя, ее можно скачать в виде
 файла и отправиться за покупками.
 
-[//]: # (![Workflow]&#40;https://github.com/drode1/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg&#41;)
+![Workflow](https://github.com/drode1/foodgram-project-react/blob/master/.github/workflows/main.yml/badge.svg)
 
 ### **Стек**
 
