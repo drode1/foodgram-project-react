@@ -1,14 +1,8 @@
 from rest_framework import permissions
 
 
-class IsUserOrAdminOrReadOnly(permissions.BasePermission):
+class IsUserOrAdminOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
     """ Права для проверки является пользователь владельцем объекта. """
 
-    def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated)
-
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
         return request.user == obj.author
