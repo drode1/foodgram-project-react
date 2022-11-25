@@ -77,33 +77,37 @@ class RecipeViewSet(viewsets.ModelViewSet):
         в корзине.
         """
 
-        instance = get_object_or_404(instance, user=request.user,
-                                     recipe__id=pk)
-        instance.delete()
+        get_object_or_404(instance, user=request.user, recipe__id=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=('POST', 'DELETE',),
+    @action(detail=False, methods=('POST',),
             permission_classes=(permissions.IsAuthenticated,),
             url_path=r'(?P<pk>\d+)/favorite')
     def favorite(self, request, pk):
-        """ Метод для добавления и удаления рецептов в избранное. """
+        """ Метод для добавления рецептов в избранное. """
 
-        if request.method == 'POST':
-            return self.add_action_method(request, pk,
-                                          FavoriteRecipeSerializer,
-                                          FavoriteRecipes)
+        return self.add_action_method(request, pk, FavoriteRecipeSerializer,
+                                      FavoriteRecipes)
+
+    @favorite.mapping.delete
+    def delete_favorite(self, request, pk):
+        """ Метод для удаления рецептов из избранноого. """
+
         return self.delete_action_method(request, pk, FavoriteRecipes)
 
-    @action(detail=False, methods=('POST', 'DELETE',),
+    @action(detail=False, methods=('POST',),
             permission_classes=(permissions.IsAuthenticated,),
             url_path=r'(?P<pk>\d+)/shopping_cart')
     def shopping_cart(self, request, pk):
-        """ Метод для добавления и удаления товаров в корзину. """
+        """ Метод для добавления товаров в корзину. """
 
-        if request.method == 'POST':
-            return self.add_action_method(request, pk,
-                                          UserShoppingCartSerializer,
-                                          UserShoppingCart)
+        return self.add_action_method(request, pk, UserShoppingCartSerializer,
+                                      UserShoppingCart)
+
+    @shopping_cart.mapping.delete
+    def delete_shopping_cart(self, request, pk):
+        """ Метод для удаления товаров в корзине. """
+
         return self.delete_action_method(request, pk, UserShoppingCart)
 
     @action(detail=False, methods=('GET',),
