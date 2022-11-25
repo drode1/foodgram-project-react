@@ -1,16 +1,19 @@
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
+from foodgram.foodgram.settings import DEFAULT_MAX_LENGTH
 from foodgram.users.models import User
 
 
 class Tag(models.Model):
     """ Модель для тегов, используемых в рецептах. """
 
-    name = models.CharField('Название', max_length=200, unique=True)
+    name = models.CharField('Название', max_length=DEFAULT_MAX_LENGTH,
+                            unique=True)
     color = models.CharField('Цвет в HEX', max_length=7, unique=True,
                              null=True)
-    slug = models.SlugField('Слаг', max_length=200, unique=True, null=True,
+    slug = models.SlugField('Слаг', max_length=DEFAULT_MAX_LENGTH, unique=True,
+                            null=True,
                             validators=[
                                 RegexValidator(regex='[-a-zA-Z0-9_]+$')]
                             )
@@ -28,14 +31,24 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     """ Модель для ингредиентов, используемых в рецептах. """
 
-    name = models.CharField('Название', max_length=200)
-    measurement_unit = models.CharField('Единица измерения', max_length=200)
+    name = models.CharField('Название', max_length=DEFAULT_MAX_LENGTH)
+    measurement_unit = models.CharField('Единица измерения',
+                                        max_length=DEFAULT_MAX_LENGTH
+                                        )
 
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         db_table = 'ingredients'
         ordering = ('id',)
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='Unique name measurement_unit required',
+
+            )
+        ]
 
     def __str__(self):
         return self.name
@@ -44,12 +57,12 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     """ Модель рецептов. """
 
-    name = models.CharField('Название', max_length=200)
+    name = models.CharField('Название', max_length=DEFAULT_MAX_LENGTH)
     text = models.TextField('Описание')
-    cooking_time = models.PositiveIntegerField('Время приготовления',
-                                               validators=[
-                                                   MinValueValidator(1)]
-                                               )
+    cooking_time = models.FloatField('Время приготовления',
+                                     validators=[
+                                         MinValueValidator(1)]
+                                     )
     image = models.ImageField('Изображение',
                               upload_to='recipes/'
                               )
@@ -90,14 +103,15 @@ class RecipeIngredientAmount(models.Model):
                                on_delete=models.CASCADE,
                                verbose_name='Рецепт',
                                )
-    amount = models.PositiveIntegerField('Количество',
-                                         validators=[MinValueValidator(1)],
-                                         blank=True,
-                                         )
+    amount = models.FloatField('Количество',
+                               validators=[MinValueValidator(1)],
+                               blank=True,
+                               )
 
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ('-id',)
 
     def __str__(self):
         return f'{self.recipe.name} - {self.ingredient} - {self.amount}'
@@ -131,12 +145,12 @@ class FavoriteRecipes(models.Model):
     user = models.ForeignKey(User,
                              verbose_name='Подписчик',
                              on_delete=models.CASCADE,
-                             related_name='favorite_recipe'
+                             related_name='favorites'
                              )
     recipe = models.ForeignKey(Recipe,
                                verbose_name='Рецепт',
                                on_delete=models.CASCADE,
-                               related_name='favorite_recipe'
+                               related_name='favorites'
                                )
 
     class Meta:
