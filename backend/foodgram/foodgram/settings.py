@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'test-key')
 
 DEBUG = os.getenv('DEBUG', False)
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*')
 
 # Application definition
 
@@ -137,7 +137,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS':
         'api.pagination.CustomPagination',
-    'PAGE_SIZE': 100,
+    'PAGE_SIZE': 6,
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
