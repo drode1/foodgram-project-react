@@ -1,6 +1,6 @@
 from django_filters import rest_framework
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.models import Ingredient, Recipe
 
 
 class IngredientFilter(rest_framework.FilterSet):
@@ -22,10 +22,7 @@ class RecipeFilter(rest_framework.FilterSet):
         method='is_in_shopping_cart_filter')
     author = rest_framework.NumberFilter(field_name='author__id',
                                          lookup_expr='exact')
-    tags = rest_framework.ModelMultipleChoiceFilter(field_name='tags__slug',
-                                                    to_field_name='slug',
-                                                    queryset=Tag.objects.all()
-                                                    )
+    tags = rest_framework.AllValuesMultipleFilter(field_name='tags__slug', )
 
     def is_favorited_filter(self, queryset, name, value):
         if value and self.request.user.is_authenticated:
