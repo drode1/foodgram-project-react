@@ -27,8 +27,7 @@ class Command(BaseCommand):
                 with open(f'static/data/{file}.csv', encoding='utf-8') as f:
                     print(f'Начался импорт данных {file}')
                     for row in DictReader(f):
-                        if not model.objects.filter(**row).exists():
-                            model.objects.create(**row)
+                        model.objects.get_or_create(**row)
                 print(f'Импорт данных {file} завершен.')
 
     def handle(self, *args, **options):
