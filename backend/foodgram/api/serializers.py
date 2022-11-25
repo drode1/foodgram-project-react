@@ -3,7 +3,6 @@ from typing import Dict
 
 from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -71,7 +70,8 @@ class UserSerializer(serializers.ModelSerializer):
         Метод проверяющий подписан ли текущий пользователь на другого или
         нет пользователя.
         """
-
+        if not self.context.get('request'):
+            return False
         username = self.context.get('request').user
         if username.is_anonymous or username == obj.username:
             return False
@@ -115,8 +115,7 @@ class SubscriptionSerializer(UserSerializer):
 
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        author = get_object_or_404(User, username=obj.username)
-        recipes = Recipe.objects.filter(author=author)
+        recipes = Recipe.objects.filter(author__username=obj.username)
         if limit:
             recipes = recipes.all()[:int(limit)]
         return RecipeListSerializer(recipes, many=True).data
@@ -128,8 +127,7 @@ class SubscriptionSerializer(UserSerializer):
         пользователю.
         """
 
-        recipe_author = get_object_or_404(User, username=obj.username)
-        return Recipe.objects.filter(author=recipe_author).count()
+        return Recipe.objects.filter(author__username=obj.username).count()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -199,6 +197,8 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def check_object_exists(context, instance, obj):
+        if not context.get('request'):
+            return False
         username = context.get('request').user
         if username.is_anonymous:
             return False

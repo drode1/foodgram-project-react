@@ -66,10 +66,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response({'errors': 'Такой объект уже существует'},
                             status=status.HTTP_400_BAD_REQUEST)
         serializer = serializers(data=data, context={'request': request})
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
     def delete_action_method(request, pk, instance):
@@ -78,9 +77,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         в корзине.
         """
 
-        recipe = get_object_or_404(Recipe, id=pk)
         instance = get_object_or_404(instance, user=request.user,
-                                     recipe=recipe)
+                                     recipe__id=pk)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -179,13 +177,7 @@ class SubscribeApiView(APIView):
 
     def delete(self, request, *args, **kwargs):
         follower_id = self.kwargs.get('user_id')
-        subscription = (
-            Subscription.objects.filter(user=request.user,
-                                        follower_id=follower_id)
-        )
-        if subscription:
-            subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({'error': 'Вы не подписаны на пользователя'},
-                        status=status.HTTP_400_BAD_REQUEST
-                        )
+        subscription = get_object_or_404(Subscription, user=request.user,
+                                         follower_id=follower_id)
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
