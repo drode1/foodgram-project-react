@@ -255,7 +255,10 @@ class RecipeSerializer(BaseRecipeSerializer):
         return super().update(instance, validated_data)
 
     def validate(self, data):
-        """ Валидируем теги и ингредиенты на пустые списки и дубликаты. """
+        """
+        Валидируем теги и ингредиенты на пустые списки и дубликаты.
+        А также на кол-во ингредиента в рецепте.
+        """
 
         duplicate_error = serializers.ValidationError({
             'error': 'Нельзя добавить одинаковые элементы'
@@ -270,6 +273,10 @@ class RecipeSerializer(BaseRecipeSerializer):
         for ingredient in ingredients_set:
             if ingredient['id'] in ingredients_list:
                 raise duplicate_error
+            if ingredient['amount'] < 0.1:
+                raise serializers.ValidationError({
+                    'error': 'Кол-во ингредиентов не может быть меньше 0.1'
+                })
             ingredients_list.append(ingredient['id'])
         tags = data['tags']
         if not tags:
@@ -279,6 +286,16 @@ class RecipeSerializer(BaseRecipeSerializer):
             if tag in tags_list:
                 raise duplicate_error
             tags_list.append(tag)
+        return data
+
+    def validate_cooking_time(self, data):
+        """ Метод для валидации времени приготовления рецепта. """
+
+        cooking_time = self.initial_data.get('cooking_time')
+        if cooking_time < 0.1:
+            raise serializers.ValidationError(
+                'Время приготовления должно быть больше 0.1'
+            )
         return data
 
     @staticmethod

@@ -61,7 +61,7 @@ class Recipe(models.Model):
     text = models.TextField('Описание')
     cooking_time = models.FloatField('Время приготовления',
                                      validators=[
-                                         MinValueValidator(1)]
+                                         MinValueValidator(0.1)]
                                      )
     image = models.ImageField('Изображение',
                               upload_to='recipes/'
@@ -104,7 +104,7 @@ class RecipeIngredientAmount(models.Model):
                                verbose_name='Рецепт',
                                )
     amount = models.FloatField('Количество',
-                               validators=[MinValueValidator(1)],
+                               validators=[MinValueValidator(0.1)],
                                blank=True,
                                )
 
