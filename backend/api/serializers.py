@@ -1,8 +1,7 @@
-import base64
 from typing import Dict
 
 from django.contrib.auth.hashers import make_password
-from django.core.files.base import ContentFile
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -10,20 +9,6 @@ from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
                             RecipeIngredientAmount, RecipeTags, Tag,
                             UserShoppingCart)
 from users.models import Subscription, User
-
-
-class Base64ImageField(serializers.ImageField):
-    """ Базовый класс для обработки файлов в base64 формате. """
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format_type, img_string = data.split(';base64,')
-            ext = format_type.split('/')[-1]
-            data = ContentFile(base64.b64decode(img_string),
-                               name='temp.' + ext
-                               )
-
-        return super().to_internal_value(data)
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
