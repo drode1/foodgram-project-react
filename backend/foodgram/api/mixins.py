@@ -1,8 +1,7 @@
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import permissions, viewsets
 
 
-class BaseGetApiView(mixins.ListModelMixin, mixins.RetrieveModelMixin,
-                     viewsets.GenericViewSet):
+class BaseGetApiView(viewsets.ReadOnlyModelViewSet):
     """ Базовый класс используемый для тегов и ингредиентов. """
 
     permission_classes = (permissions.AllowAny,)
