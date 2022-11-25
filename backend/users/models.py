@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import EmailValidator
 from django.db import models
 
-from foodgram.foodgram.settings import DEFAULT_USER_MAX_LENGTH
+from foodgram.settings import DEFAULT_USER_MAX_LENGTH
 
 
 class User(AbstractUser):

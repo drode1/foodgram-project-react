@@ -6,10 +6,10 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from foodgram.recipes.models import (FavoriteRecipes, Ingredient, Recipe,
-                                     RecipeIngredientAmount, RecipeTags, Tag,
-                                     UserShoppingCart)
-from foodgram.users.models import Subscription, User
+from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
+                            RecipeIngredientAmount, RecipeTags, Tag,
+                            UserShoppingCart)
+from users.models import Subscription, User
 
 
 class Base64ImageField(serializers.ImageField):
