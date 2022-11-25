@@ -46,24 +46,24 @@ python -m pip install --upgrade pip
 Установить зависимости из файла requirements.txt:
 
 ``` 
-pip install -r backend/foodgram/requirements.txt
+pip install -r backend/requirements.txt
 ```   
 
 Выполнить миграции:
 
 ```
-python backend/foodgram/manage.py migrate
+python backend/manage.py migrate
 ```       
 
 Запустить проект:
 
 ```
-python backend/foodgram/manage.py runserver
+python backend/manage.py runserver
 ```
 
 ### Как запустить скрипт через Docker:
 
-1. В папке ```backend/foodgram/``` создайте файл, по аналогии
+1. В папке ```backend/``` создайте файл, по аналогии
    с ```.env.example``` и заполните ее данными;
 2. Перейдите в папку ```infra/```.
 3. Создайте образ докера и запустите контейнер в
