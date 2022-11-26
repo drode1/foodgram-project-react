@@ -10,14 +10,12 @@ from rest_framework.views import APIView
 from api.filters import IngredientFilter, RecipeFilter
 from api.mixins import BaseGetApiView
 from api.permissions import IsUserOrAdminOrReadOnly
-from api.serializers import (FavoriteRecipeSerializer,
-                             IngredientSerializer,
+from api.serializers import (FavoriteRecipeSerializer, IngredientSerializer,
                              ReadRecipeSerializer, RecipeSerializer,
                              SubscriptionSerializer, TagSerializer,
                              UserShoppingCartSerializer)
 from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
-                            RecipeIngredientAmount, Tag,
-                            UserShoppingCart)
+                            RecipeIngredientAmount, Tag, UserShoppingCart)
 from users.models import Subscription, User
 
 
