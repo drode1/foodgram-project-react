@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework
@@ -49,11 +50,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return ReadRecipeSerializer
         return RecipeSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(author=self.request.user)
 
     @staticmethod
-    def add_action_method(request, pk, serializers, instance):
+    def add_action_method(request, pk: int, serializers, instance) -> Response:
         """
         Общий метод для обработки запросов на добавление подписки и товаров
         в корзину.
@@ -71,7 +72,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @staticmethod
-    def delete_action_method(request, pk, instance):
+    def delete_action_method(request, pk: int, instance) -> Response:
         """
         Общий метод для обработки запросов на удаление подписок и товаров
         в корзине.
@@ -83,29 +84,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=('POST',),
             permission_classes=(permissions.IsAuthenticated,),
             url_path=r'(?P<pk>\d+)/favorite')
-    def favorite(self, request, pk):
+    def favorite(self, request, pk: int) -> Response:
         """ Метод для добавления рецептов в избранное. """
 
         return self.add_action_method(request, pk, FavoriteRecipeSerializer,
                                       FavoriteRecipes)
 
     @favorite.mapping.delete
-    def delete_favorite(self, request, pk):
-        """ Метод для удаления рецептов из избранноого. """
+    def delete_favorite(self, request, pk: int) -> Response:
+        """ Метод для удаления рецептов из избранного. """
 
         return self.delete_action_method(request, pk, FavoriteRecipes)
 
     @action(detail=False, methods=('POST',),
             permission_classes=(permissions.IsAuthenticated,),
             url_path=r'(?P<pk>\d+)/shopping_cart')
-    def shopping_cart(self, request, pk):
+    def shopping_cart(self, request, pk: int) -> Response:
         """ Метод для добавления товаров в корзину. """
 
         return self.add_action_method(request, pk, UserShoppingCartSerializer,
                                       UserShoppingCart)
 
     @shopping_cart.mapping.delete
-    def delete_shopping_cart(self, request, pk):
+    def delete_shopping_cart(self, request, pk: int) -> Response:
         """ Метод для удаления товаров в корзине. """
 
         return self.delete_action_method(request, pk, UserShoppingCart)
@@ -153,7 +154,7 @@ class SubscriptionApiView(mixins.ListModelMixin,
 
     serializer_class = SubscriptionSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[User]:
         user = get_object_or_404(User, id=self.request.user.id)
         follower = Subscription.objects.filter(user=user).values('follower')
         return User.objects.filter(id__in=follower)
@@ -165,7 +166,7 @@ class SubscribeApiView(APIView):
     permission_classes = (IsUserOrAdminOrReadOnly,)
     serializer_class = SubscriptionSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> Response:
         user = request.user
         follower_id = self.kwargs.get('user_id')
         if user.id == follower_id:
@@ -184,7 +185,7 @@ class SubscribeApiView(APIView):
             status=status.HTTP_201_CREATED
         )
 
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs) -> Response:
         follower_id = self.kwargs.get('user_id')
         subscription = get_object_or_404(Subscription, user=request.user,
                                          follower_id=follower_id)
