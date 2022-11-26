@@ -1,16 +1,17 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import EmailValidator
 from django.db import models
 
-from foodgram.settings import DEFAULT_USER_MAX_LENGTH
-
 
 class User(AbstractUser):
-    first_name = models.CharField('Имя', max_length=DEFAULT_USER_MAX_LENGTH)
-    last_name = models.CharField('Фамилия', max_length=DEFAULT_USER_MAX_LENGTH)
-    email = models.EmailField('Почта', max_length=255,
-                              validators=[EmailValidator]
-                              )
+    first_name = models.CharField('Имя',
+                                  max_length=settings.DEFAULT_USER_MAX_LENGTH)
+    last_name = models.CharField('Фамилия',
+                                 max_length=settings.DEFAULT_USER_MAX_LENGTH)
+    email = models.EmailField('Почта',
+                              max_length=settings.DEFAULT_EMAIL_MAX_LENGTH,
+                              validators=[EmailValidator])
     REQUIRED_FIELDS = ('email', 'first_name', 'last_name',)
 
     class Meta:
@@ -23,16 +24,11 @@ class User(AbstractUser):
 
 
 class Subscription(models.Model):
-    user = models.ForeignKey(User,
-                             verbose_name='Пользователь',
-                             related_name='follower',
-                             on_delete=models.CASCADE
-                             )
-    follower = models.ForeignKey(User,
-                                 verbose_name='Подписчик',
+    user = models.ForeignKey(User, verbose_name='Пользователь',
+                             related_name='follower', on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, verbose_name='Подписчик',
                                  related_name='following',
-                                 on_delete=models.CASCADE
-                                 )
+                                 on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Подписка'

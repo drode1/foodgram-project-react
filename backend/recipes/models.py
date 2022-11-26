@@ -1,22 +1,21 @@
+from django.conf import settings
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
-from foodgram.settings import DEFAULT_MAX_LENGTH
 from users.models import User
 
 
 class Tag(models.Model):
     """ Модель для тегов, используемых в рецептах. """
 
-    name = models.CharField('Название', max_length=DEFAULT_MAX_LENGTH,
+    name = models.CharField('Название', max_length=settings.DEFAULT_MAX_LENGTH,
                             unique=True)
-    color = models.CharField('Цвет в HEX', max_length=7, unique=True,
-                             null=True)
-    slug = models.SlugField('Слаг', max_length=DEFAULT_MAX_LENGTH, unique=True,
-                            null=True,
-                            validators=[
-                                RegexValidator(regex='[-a-zA-Z0-9_]+$')]
-                            )
+    color = models.CharField('Цвет в HEX', unique=True, null=True,
+                             max_length=settings.DEFAULT_HEX_COLOR_MAX_LENGTH)
+    slug = models.SlugField('Слаг', max_length=settings.DEFAULT_MAX_LENGTH,
+                            unique=True, null=True,
+                            validators=[RegexValidator(regex='[-a-zA-Z0-9_]+$')
+                                        ])
 
     class Meta:
         verbose_name = 'Тег'
@@ -31,10 +30,9 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     """ Модель для ингредиентов, используемых в рецептах. """
 
-    name = models.CharField('Название', max_length=DEFAULT_MAX_LENGTH)
+    name = models.CharField('Название', max_length=settings.DEFAULT_MAX_LENGTH)
     measurement_unit = models.CharField('Единица измерения',
-                                        max_length=DEFAULT_MAX_LENGTH
-                                        )
+                                        max_length=settings.DEFAULT_MAX_LENGTH)
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -57,30 +55,21 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     """ Модель рецептов. """
 
-    name = models.CharField('Название', max_length=DEFAULT_MAX_LENGTH)
+    name = models.CharField('Название', max_length=settings.DEFAULT_MAX_LENGTH)
     text = models.TextField('Описание')
-    cooking_time = models.FloatField('Время приготовления',
-                                     validators=[
-                                         MinValueValidator(0.1)]
-                                     )
-    image = models.ImageField('Изображение',
-                              upload_to='recipes/'
-                              )
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        through='RecipeIngredientAmount',
-        verbose_name='Ингридиенты'
-    )
-    tags = models.ManyToManyField(
-        Tag,
-        through='RecipeTags',
-        verbose_name='Теги'
-    )
-    author = models.ForeignKey(User,
-                               verbose_name='Автор',
+    cooking_time = models.PositiveSmallIntegerField('Время приготовления',
+                                                    validators=[
+                                                        MinValueValidator(1)])
+
+    image = models.ImageField('Изображение', upload_to='recipes/')
+    ingredients = models.ManyToManyField(Ingredient,
+                                         through='RecipeIngredientAmount',
+                                         verbose_name='Ингридиенты')
+    tags = models.ManyToManyField(Tag, through='RecipeTags',
+                                  verbose_name='Теги')
+    author = models.ForeignKey(User, verbose_name='Автор',
                                related_name='author',
-                               on_delete=models.CASCADE,
-                               )
+                               on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -95,18 +84,13 @@ class Recipe(models.Model):
 class RecipeIngredientAmount(models.Model):
     """ Пивот модель, используемая для хранения ингредиентов в рецепте. """
 
-    ingredient = models.ForeignKey(Ingredient,
-                                   on_delete=models.CASCADE,
-                                   verbose_name='Ингредиент',
-                                   )
-    recipe = models.ForeignKey(Recipe,
-                               on_delete=models.CASCADE,
-                               verbose_name='Рецепт',
-                               )
-    amount = models.FloatField('Количество',
-                               validators=[MinValueValidator(0.1)],
-                               blank=True,
-                               )
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
+                                   verbose_name='Ингредиент')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               verbose_name='Рецепт')
+    amount = models.PositiveSmallIntegerField('Количество', blank=True,
+                                              validators=[
+                                                  MinValueValidator(1)])
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -120,16 +104,11 @@ class RecipeIngredientAmount(models.Model):
 class RecipeTags(models.Model):
     """ Пивот модель, используемая для хранения тегов в рецепте. """
 
-    tag = models.ForeignKey(Tag,
-                            on_delete=models.CASCADE,
-                            verbose_name='Тег',
-                            related_name='recipe_tag'
-                            )
-    recipe = models.ForeignKey(Recipe,
-                               on_delete=models.CASCADE,
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, verbose_name='Тег',
+                            related_name='recipe_tag')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                verbose_name='Рецепт',
-                               related_name='recipe_tag'
-                               )
+                               related_name='recipe_tag')
 
     class Meta:
         verbose_name = 'Тег в рецептах'
@@ -142,16 +121,12 @@ class RecipeTags(models.Model):
 class FavoriteRecipes(models.Model):
     """ Модель подписок добавления рецептов в избранное у пользователей. """
 
-    user = models.ForeignKey(User,
-                             verbose_name='Подписчик',
+    user = models.ForeignKey(User, verbose_name='Подписчик',
                              on_delete=models.CASCADE,
-                             related_name='favorites'
-                             )
-    recipe = models.ForeignKey(Recipe,
-                               verbose_name='Рецепт',
+                             related_name='favorites')
+    recipe = models.ForeignKey(Recipe, verbose_name='Рецепт',
                                on_delete=models.CASCADE,
-                               related_name='favorites'
-                               )
+                               related_name='favorites')
 
     class Meta:
         verbose_name = 'Избранное'
@@ -172,16 +147,12 @@ class FavoriteRecipes(models.Model):
 class UserShoppingCart(models.Model):
     """ Модель корзины, куда пользователей может добавлять рецепты. """
 
-    user = models.ForeignKey(User,
-                             verbose_name='Пользователь',
+    user = models.ForeignKey(User, verbose_name='Пользователь',
                              on_delete=models.CASCADE,
-                             related_name='shopping_cart'
-                             )
-    recipe = models.ForeignKey(Recipe,
-                               verbose_name='Рецепт',
+                             related_name='shopping_cart')
+    recipe = models.ForeignKey(Recipe, verbose_name='Рецепт',
                                on_delete=models.CASCADE,
-                               related_name='shopping_cart'
-                               )
+                               related_name='shopping_cart')
 
     class Meta:
         verbose_name = 'Покупка'
