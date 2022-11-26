@@ -184,8 +184,6 @@ class SubscribeApiView(APIView):
         )
 
     def delete(self, request, *args, **kwargs) -> Response:
-        follower_id = self.kwargs.get('user_id')
-        subscription = get_object_or_404(Subscription, user=request.user,
-                                         follower_id=follower_id)
-        subscription.delete()
+        get_object_or_404(Subscription, user=request.user,
+                          follower_id=self.kwargs.get('user_id')).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
