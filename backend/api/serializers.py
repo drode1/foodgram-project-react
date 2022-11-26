@@ -55,9 +55,12 @@ class UserSerializer(serializers.ModelSerializer):
         Метод проверяющий подписан ли текущий пользователь на другого или
         нет пользователя.
         """
-        if not self.context.get('request'):
+
+        request = self.context.get('request')
+
+        if not request:
             return False
-        username = self.context.get('request').user
+        username = request.user
         if username.is_anonymous or username == obj.username:
             return False
         return Subscription.objects.filter(user=username,
@@ -182,9 +185,10 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def check_object_exists(context, instance, obj):
-        if not context.get('request'):
+        request = context.get('request')
+        if not request:
             return False
-        username = context.get('request').user
+        username = request.user
         if username.is_anonymous:
             return False
         return instance.objects.filter(user=username,
@@ -258,9 +262,9 @@ class RecipeSerializer(BaseRecipeSerializer):
         for ingredient in ingredients_set:
             if ingredient['id'] in ingredients_list:
                 raise duplicate_error
-            if ingredient['amount'] < 0.1:
+            if ingredient['amount'] < 1:
                 raise serializers.ValidationError({
-                    'error': 'Кол-во ингредиентов не может быть меньше 0.1'
+                    'error': 'Кол-во ингредиентов не может быть меньше 1'
                 })
             ingredients_list.append(ingredient['id'])
         tags = data['tags']
@@ -277,9 +281,9 @@ class RecipeSerializer(BaseRecipeSerializer):
         """ Метод для валидации времени приготовления рецепта. """
 
         cooking_time = self.initial_data.get('cooking_time')
-        if cooking_time < 0.1:
+        if cooking_time < 1:
             raise serializers.ValidationError(
-                'Время приготовления должно быть больше 0.1'
+                'Время приготовления должно быть больше 1'
             )
         return data
 
