@@ -112,27 +112,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=('GET',),
             permission_classes=(permissions.IsAuthenticated,))
-    def download_shopping_cart(self, request):
-        """ Метод для скачивания корзины пользователей. """
+    def download_shopping_cart(self, request) -> HttpResponse:
+        """ Метод для скачивания корзины ингредиентов пользователей. """
+
+        cart_ingredient_amount = RecipeIngredientAmount.objects.filter(
+            recipe__shopping_cart__user=request.user,
+        )
+
+        return self.generate_shopping_cart_file(cart_ingredient_amount)
+
+    @staticmethod
+    def generate_shopping_cart_file(queryset) -> HttpResponse:
+        """
+        Метод генерирует файл с ингредиентами на основе списка рецептов,
+        которые пользователь добавил в корзину.
+        """
 
         cart_ingredients = {}
-        cart_recipes = (
-            UserShoppingCart.objects.filter(user=request.user).values(
-                'recipe_id')
-        )
-        recipes = Recipe.objects.filter(pk__in=cart_recipes)
-        for recipe in recipes:
-            ingredients_amount = RecipeIngredientAmount.objects.filter(
-                recipe=recipe)
-            for ingredient in ingredients_amount:
-                name = (f'{ingredient.ingredient.name} '
-                        f'({ingredient.ingredient.measurement_unit})'
-                        )
-                amount = ingredient.amount
-                if name in cart_ingredients:
-                    cart_ingredients[name] += amount
-                else:
-                    cart_ingredients[name] = amount
+        for ingredient in queryset:
+            name = (f'{ingredient.ingredient.name} '
+                    f'({ingredient.ingredient.measurement_unit})'
+                    )
+            amount = ingredient.amount
+            if name in cart_ingredients:
+                cart_ingredients[name] += amount
+            else:
+                cart_ingredients[name] = amount
 
         response = HttpResponse(content_type='text/plain')
         file_body = 'Список покупок:\n'
