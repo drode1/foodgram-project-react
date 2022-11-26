@@ -9,9 +9,7 @@ services:
     container_name: db
 
   backend:
-    build:
-      context: ../backend/foodgram/
-      dockerfile: Dockerfile
+    image: drode1/foodgram-backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
