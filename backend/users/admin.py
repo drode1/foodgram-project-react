@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-from recipes.models import Recipe
 from users.models import User
 
 
@@ -17,4 +16,4 @@ class UserAdmin(admin.ModelAdmin):
     def get_quantity_user_recipes(obj):
         """ Метод подсчитывает кол-во рецептов каждого пользователя. """
 
-        return Recipe.objects.filter(author_id=obj.id).count()
+        return obj.author.count()

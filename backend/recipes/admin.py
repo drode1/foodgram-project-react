@@ -54,7 +54,7 @@ class RecipeAdmin(admin.ModelAdmin):
         Метод подсчитывает пользователей добавили данный рецепт в избранное.
         """
 
-        return FavoriteRecipes.objects.filter(recipe_id=obj.id).count()
+        return obj.favorites.count()
 
     @staticmethod
     @admin.display(description='Ингредиенты')
