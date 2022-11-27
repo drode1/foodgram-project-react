@@ -63,7 +63,7 @@ class RecipeAdmin(admin.ModelAdmin):
         Метод выводит список ингредиентов, которые привязаны к рецепту.
         """
 
-        return [ing for ing in Ingredient.objects.filter(recipe__id=obj.id)]
+        return [ing for ing in obj.ingredients]
 
 
 @admin.register(RecipeTags)
