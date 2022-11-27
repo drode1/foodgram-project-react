@@ -1,4 +1,4 @@
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework
@@ -115,8 +115,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """ Метод для скачивания корзины ингредиентов пользователей. """
 
         cart_ingredient_amount = RecipeIngredientAmount.objects.filter(
-            recipe__shopping_cart__user=request.user,
-        )
+            recipe__shopping_cart__user=request.user, ).values(
+            'ingredient__name', 'ingredient__measurement_unit').order_by(
+            'ingredient__name').annotate(ingredients_total=Sum('amount'))
 
         return self.generate_shopping_cart_file(cart_ingredient_amount)
 
@@ -129,10 +130,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         cart_ingredients = {}
         for ingredient in queryset:
-            name = (f'{ingredient.ingredient.name} '
-                    f'({ingredient.ingredient.measurement_unit})'
-                    )
-            amount = ingredient.amount
+            name = (f"{ingredient.get('ingredient__name')} "
+                    f"({ingredient.get('ingredient__measurement_unit')})")
+            amount = ingredient.get('ingredients_total')
             if name in cart_ingredients:
                 cart_ingredients[name] += amount
             else:
