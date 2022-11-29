@@ -5,7 +5,7 @@ services:
     volumes:
       - postgres_value:/var/lib/postgresql/data/
     env_file:
-      - ../backend/.env
+      - ./.env
     container_name: db
 
   backend:
@@ -17,7 +17,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ../backend/.env
+      - ./.env
     container_name: backend
 
   frontend:
@@ -33,7 +33,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static-backend/
