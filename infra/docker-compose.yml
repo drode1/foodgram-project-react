@@ -24,6 +24,7 @@ services:
     image: drode1/foodgram-frontend:latest
     volumes:
       - frontend_value:/app/result_build/
+    container_name: frontend
 
 
   nginx:
