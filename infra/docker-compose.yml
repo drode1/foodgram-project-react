@@ -21,9 +21,11 @@ services:
     container_name: backend
 
   frontend:
-    image: drode1/foodgram-frontend:latest
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
-      - frontend_value:/app/result_build/
+      - ../frontend/:/app/result_build/
 
   nginx:
     image: nginx:1.21.3-alpine
@@ -55,4 +57,3 @@ volumes:
   postgres_value:
   static_value:
   media_value:
-  frontend_value:
