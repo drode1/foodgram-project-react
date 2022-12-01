@@ -163,5 +163,4 @@ DJOSER = {
 
 # CORS Policy
 CORS_URLS_REGEX = os.getenv('CORS_URLS_REGEX', "r'^/api/.*$'")
-CORS_ALLOWED_ORIGINS = str(
-    os.getenv('CORS_ALLOWED_ORIGINS', default='*')).split()
+CORS_ALLOWED_ORIGINS = str(os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost')).split()
