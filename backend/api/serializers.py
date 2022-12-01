@@ -280,7 +280,7 @@ class RecipeSerializer(BaseRecipeSerializer):
     def validate_cooking_time(self, data):
         """ Метод для валидации времени приготовления рецепта. """
 
-        cooking_time = self.initial_data.get('cooking_time')
+        cooking_time = int(self.initial_data.get('cooking_time'))
         if cooking_time < 1:
             raise serializers.ValidationError(
                 'Время приготовления должно быть больше 1'
