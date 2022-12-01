@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
         for data in self.models:
             for model, file in data:
-                with open(f'static/data/{file}.csv', encoding='utf-8') as f:
+                with open(f'data/{file}.csv', encoding='utf-8') as f:
                     print(f'Начался импорт данных {file}')
                     for row in DictReader(f):
                         model.objects.get_or_create(**row)
