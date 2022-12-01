@@ -9,6 +9,7 @@
 
 ![Workflow](https://github.com/drode1/foodgram-project-react/blob/master/.github/workflows/main.yml/badge.svg)
 
+Проверить сайт можно по ссылке [eremezov.ru](https://eremezov.ru)
 ### **Стек**
 
 ![python version](https://img.shields.io/badge/Python-3.7-green)
@@ -84,6 +85,15 @@ python manage.py import
 - тегам;
 - пользователям.
 
+### Как развернуть проект на сервере
+1. Скопируйте на сервер папки `docs, static`
+2. Скопируйте на сервер файл `infra/docker-compose-server.yml` и переименуйте его в `docker-compose.yml (для версии без SSL скопируйте файл `infra/docker-compose.yml`)
+3. Создайте на сервере папку `nginx` и поместите в него файл `infra/nginx.conf`, предварительно изменив `server_name` на имя вашего сервера (если нужна версия без ssl, то скопируйте файл `nginx-local.conf`)
+4. Запустите контейнер с помощью команды `sudo docker-compose up -d`, а после сделайте миграции и импорт тестовых данных 
+   5. `sudo docker exec -it backend bash`
+   6. `python manage.py migrate`
+   7. `python manage.py import`
+8. Затем перезапустите контейнер с помощью команды из п.4
 ___
 
 ## Контакты
