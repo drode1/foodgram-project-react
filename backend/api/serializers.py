@@ -14,6 +14,11 @@ from users.models import Subscription, User
 class CreateUserSerializer(serializers.ModelSerializer):
     """ Сериализатор используемый для создания пользователей. """
 
+    email = serializers.EmailField(
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            message='Пользователь с такой почтой уже существует.')]
+    )
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
