@@ -7,7 +7,7 @@
 продуктовую корзину выбранных рецептов пользователя, ее можно скачать в виде
 файла и отправиться за покупками.
 
-![Workflow](https://github.com/drode1/foodgram-project-react/blob/master/.github/workflows/main.yml/badge.svg)
+![Workflow](https://github.com/drode1/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 Проверить сайт можно по ссылке [eremezov.ru](https://eremezov.ru)
 ### **Стек**
