@@ -19,6 +19,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
             queryset=User.objects.all(),
             message='Пользователь с такой почтой уже существует.')]
     )
+
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name',
@@ -39,6 +40,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return user
 
 
+# TODO: Написать апдейт метод для пароля и почты
+
 class UserSerializer(serializers.ModelSerializer):
     """ Сериализатор используемый для обработки пользователей. """
 
@@ -56,6 +59,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_subscribed',
         )
 
+    # TODO: при авторизации нужно делать почту нижнем регистре
     def get_is_subscribed(self, obj) -> bool:
         """
         Метод проверяющий подписан ли текущий пользователь на другого или
@@ -64,13 +68,9 @@ class UserSerializer(serializers.ModelSerializer):
 
         request = self.context.get('request')
 
-        if not request:
+        if not request or request.user.is_anonymous:
             return False
-        username = request.user
-        if username.is_anonymous or username == obj.username:
-            return False
-        return Subscription.objects.filter(user=username,
-                                           follower_id=obj.id).exists()
+        return obj.following.filter(user=request.user).exists()
 
 
 class RecipeListSerializer(serializers.ModelSerializer):
@@ -192,12 +192,9 @@ class BaseRecipeSerializer(serializers.ModelSerializer):
     @staticmethod
     def check_object_exists(context, instance, obj):
         request = context.get('request')
-        if not request:
+        if not request or request.user.is_anonymous:
             return False
-        username = request.user
-        if username.is_anonymous:
-            return False
-        return instance.objects.filter(user=username,
+        return instance.objects.filter(user=request.user,
                                        recipe_id=obj.id).exists()
 
     def get_is_favorited(self, obj) -> bool:
