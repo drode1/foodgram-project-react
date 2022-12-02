@@ -68,7 +68,7 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(Tag, through='RecipeTags',
                                   verbose_name='Теги')
     author = models.ForeignKey(User, verbose_name='Автор',
-                               related_name='author',
+                               related_name='recipe',
                                on_delete=models.CASCADE)
 
     class Meta:

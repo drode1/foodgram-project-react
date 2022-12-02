@@ -8,7 +8,7 @@ from rest_framework.validators import UniqueValidator
 from recipes.models import (FavoriteRecipes, Ingredient, Recipe,
                             RecipeIngredientAmount, RecipeTags, Tag,
                             UserShoppingCart)
-from users.models import Subscription, User
+from users.models import User
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -109,7 +109,7 @@ class SubscriptionSerializer(UserSerializer):
 
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        recipes = obj.author
+        recipes = obj.recipe
         if limit:
             recipes = recipes.all()[:int(limit)]
         return RecipeListSerializer(recipes, many=True).data
@@ -121,7 +121,7 @@ class SubscriptionSerializer(UserSerializer):
         пользователю.
         """
 
-        return obj.author.count()
+        return obj.recipe.count()
 
 
 class TagSerializer(serializers.ModelSerializer):
