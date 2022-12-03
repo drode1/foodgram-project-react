@@ -109,7 +109,7 @@ class SubscriptionSerializer(UserSerializer):
 
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        recipes = obj.recipe
+        recipes = obj.recipes
         if limit:
             recipes = recipes.all()[:int(limit)]
         return RecipeListSerializer(recipes, many=True).data
@@ -121,7 +121,7 @@ class SubscriptionSerializer(UserSerializer):
         пользователю.
         """
 
-        return obj.recipe.count()
+        return obj.recipes.count()
 
 
 class TagSerializer(serializers.ModelSerializer):
