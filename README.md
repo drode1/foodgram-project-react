@@ -86,14 +86,18 @@ python manage.py import
 - пользователям.
 
 ### Как развернуть проект на сервере
-1. Скопируйте на сервер папки `docs, static`
+1. Скопируйте на сервер папку `docs`
 2. Скопируйте на сервер файл `infra/docker-compose-server.yml` и переименуйте его в `docker-compose.yml (для версии без SSL скопируйте файл `infra/docker-compose.yml`)
 3. Создайте на сервере папку `nginx` и поместите в него файл `infra/nginx.conf`, предварительно изменив `server_name` на имя вашего сервера (если нужна версия без ssl, то скопируйте файл `nginx-local.conf`)
-4. Запустите контейнер с помощью команды `sudo docker-compose up -d`, а после сделайте миграции и импорт тестовых данных 
-   5. `sudo docker exec -it backend bash`
-   6. `python manage.py migrate`
-   7. `python manage.py import`
-8. Затем перезапустите контейнер с помощью команды из п.4
+4. Соберите папку `static на сервере. Для этого нужно:
+   6. Собрать статику django проекта, с помощью команды `python manage.py collectstatic --no-input`
+   7. Сделать build frontend папки проекта и скопируйте из папки `build/static` папки `css, js, media` и добавьте
+   8. Переместить все папки из двух пунктов выше в папку `static` на сервере 
+9. Запустите контейнер с помощью команды `sudo docker-compose up -d`, а после сделайте миграции и импорт тестовых данных
+   10. `sudo docker exec -it backend bash`
+   11. `python manage.py migrate`
+   12. `python manage.py import`
+13. Затем перезапустите контейнер с помощью команды из п.4
 ___
 
 ## Контакты
