@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-load_dotenv()
+load_dotenv(os.path.join(BASE_DIR, 'infra'))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'test-key')
 
@@ -161,6 +161,6 @@ DJOSER = {
     }
 }
 
-# CORS Policy
-CORS_URLS_REGEX = os.getenv('CORS_URLS_REGEX', "r'^/api/.*$'")
-CORS_ALLOWED_ORIGINS = str(os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost')).split()
+# # CORS Policy
+# CORS_URLS_REGEX = os.getenv('CORS_URLS_REGEX', "r'^/api/.*$'")
+# CORS_ALLOWED_ORIGINS = str(os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost')).split()
